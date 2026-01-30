@@ -128,8 +128,8 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
                     <Image
                       src={project.imageUrl}
                       alt={project.title}
-                      width={1200}
-                      height={675}
+                      width={800}
+                      height={450}
                       unoptimized
                       className="w-full h-full object-cover"
                     />
