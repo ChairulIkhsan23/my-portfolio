@@ -43,11 +43,11 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
   const imageScale = useSpring(1, { stiffness: 150, damping: 15 });
 
   // Transform untuk efek parallax
-  const translateX = useTransform(mouseX, [-200, 200], [-15, 15]);
-  const translateY = useTransform(mouseY, [-200, 200], [-15, 15]);
+  const translateX = useTransform(mouseX, [-200, 200], [-10, 10]);
+  const translateY = useTransform(mouseY, [-200, 200], [-10, 10]);
 
   // Gradient mask berdasarkan mouse position
-  const maskImage = useMotionTemplate`radial-gradient(300px at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.4), transparent 80%)`;
+  const maskImage = useMotionTemplate`radial-gradient(200px at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.3), transparent 70%)`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -63,13 +63,13 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
     // Calculate 3D rotation
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    const rotateYValue = ((x - centerX) / centerX) * 5;
-    const rotateXValue = ((centerY - y) / centerY) * 5;
+    const rotateYValue = ((x - centerX) / centerX) * 4;
+    const rotateXValue = ((centerY - y) / centerY) * 4;
 
     rotateX.set(rotateXValue);
     rotateY.set(rotateYValue);
     scale.set(1.02);
-    imageScale.set(1.05);
+    imageScale.set(1.04);
   };
 
   const handleMouseLeave = () => {
@@ -81,17 +81,17 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
   };
 
   // Particle effects data
-  const particles = Array.from({ length: 8 }, (_, i) => ({
+  const particles = Array.from({ length: 6 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    delay: Math.random() * 0.5,
+    delay: Math.random() * 0.3,
   }));
 
   return (
     <motion.div
       ref={cardRef}
-      className={`relative flex flex-col lg:flex-row gap-8 lg:gap-12 items-center mb-20 ${
+      className={`relative flex flex-col lg:flex-row gap-8 lg:gap-10 items-center mb-16 px-4 sm:px-6 lg:px-0 ${
         isAlternate ? "lg:flex-row-reverse" : ""
       }`}
       onMouseEnter={() => setIsHovered(true)}
@@ -102,13 +102,13 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
         rotateY,
         scale,
       }}
-      initial={{ opacity: 0, y: 80, rotateX: 10 }}
+      initial={{ opacity: 0, y: 60, rotateX: 8 }}
       whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{
-        duration: 0.8,
+        duration: 0.7,
         ease: [0.22, 1, 0.36, 1],
-        opacity: { duration: 0.6 },
+        opacity: { duration: 0.5 },
       }}
       whileHover={{
         transition: { type: "spring", stiffness: 300, damping: 25 },
@@ -116,10 +116,10 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
     >
       {/* Glow effect background */}
       <motion.div
-        className="absolute inset-0 rounded-3xl opacity-0 -z-10"
+        className="absolute inset-0 rounded-2xl opacity-0 -z-10"
         animate={{
-          opacity: isHovered ? 0.15 : 0,
-          background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(99, 102, 241, 0.2), transparent 50%)`,
+          opacity: isHovered ? 0.1 : 0,
+          background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(99, 102, 241, 0.15), transparent 40%)`,
         }}
         transition={{ duration: 0.2 }}
       />
@@ -129,7 +129,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
         particles.map((particle) => (
           <motion.div
             key={particle.id}
-            className="absolute w-1 h-1 bg-blue-400/30 rounded-full -z-10"
+            className="absolute w-0.5 h-0.5 bg-blue-400/20 rounded-full -z-10"
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
@@ -137,21 +137,21 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
             initial={{ scale: 0, opacity: 0 }}
             animate={{
               scale: [0, 1, 0],
-              opacity: [0, 0.8, 0],
-              y: [0, -20],
+              opacity: [0, 0.6, 0],
+              y: [0, -15],
             }}
             transition={{
-              duration: 2,
+              duration: 1.5,
               delay: particle.delay,
               repeat: Infinity,
-              repeatDelay: Math.random() * 2,
+              repeatDelay: Math.random() * 1.5,
             }}
           />
         ))}
 
       {/* Image Section dengan efek glass morphism */}
       <motion.div
-        className="w-full lg:w-7/12 relative"
+        className="w-full lg:w-6/12 relative"
         style={{
           translateX: isAlternate ? translateX : translateX,
           translateY,
@@ -159,20 +159,20 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
       >
         {/* Glowing border effect */}
         <motion.div
-          className="absolute -inset-1 rounded-3xl opacity-0"
+          className="absolute -inset-0.5 rounded-2xl opacity-0"
           animate={{
-            opacity: isHovered ? 1 : 0,
+            opacity: isHovered ? 0.8 : 0,
             background: "linear-linear(45deg, #3b82f6, #8b5cf6, #ec4899)",
           }}
           transition={{ duration: 0.3 }}
-          style={{ filter: "blur(12px)" }}
+          style={{ filter: "blur(8px)" }}
         />
 
-        <div className="relative rounded-2xl overflow-hidden border border-gray-800/50 bg-gray-900/20 backdrop-blur-sm">
+        <div className="relative rounded-xl overflow-hidden border border-gray-800/40 bg-gray-900/10 backdrop-blur-sm">
           {/* Animated gradient overlay */}
           <motion.div
             className="absolute inset-0 opacity-0"
-            animate={{ opacity: isHovered ? 0.3 : 0 }}
+            animate={{ opacity: isHovered ? 0.2 : 0 }}
             transition={{ duration: 0.3 }}
             style={{
               background: maskImage,
@@ -191,14 +191,14 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
                 <Image
                   src={project.imageUrl}
                   alt={project.title}
-                  width={1200}
-                  height={675}
+                  width={1000}
+                  height={562}
                   unoptimized
                   className="w-full h-full object-cover"
                 />
 
                 {/* Subtle gradient overlay */}
-                <div className="absolute inset-0 bg-linear-linear(to-b, transparent 60%, rgba(0,0,0,0.8))" />
+                <div className="absolute inset-0 bg-linear-linear(to-b, transparent 65%, rgba(0,0,0,0.7))" />
               </motion.div>
             ) : (
               <div className="w-full h-full bg-linear-linear(135deg, #1f2937, #111827)" />
@@ -207,18 +207,18 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
 
           {/* Interactive floating elements */}
           <motion.div
-            className="absolute top-4 left-4"
-            initial={{ opacity: 0, y: -10, scale: 0.8 }}
+            className="absolute top-3 left-3"
+            initial={{ opacity: 0, y: -8, scale: 0.8 }}
             animate={{
               opacity: isHovered ? 1 : 0.7,
-              y: isHovered ? 0 : -5,
-              scale: isHovered ? 1.1 : 1,
+              y: isHovered ? 0 : -4,
+              scale: isHovered ? 1.05 : 1,
             }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-black/80 backdrop-blur-md rounded-full border border-white/10">
-              <Sparkles size={10} className="text-yellow-400" />
-              <span className="text-xs font-semibold bg-linear-linear(to-r, #fbbf24, #f59e0b) bg-clip-text text-transparent">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-black/70 backdrop-blur-sm rounded-lg border border-white/10">
+              <Sparkles size={9} className="text-yellow-400" />
+              <span className="text-[10px] font-semibold bg-linear-linear(to-r, #fbbf24, #f59e0b) bg-clip-text text-transparent">
                 FEATURED
               </span>
             </div>
@@ -226,47 +226,47 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
 
           {/* Live preview badge */}
           <motion.div
-            className="absolute bottom-4 right-4"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: isHovered ? 1 : 0.8, x: isHovered ? 0 : 10 }}
+            className="absolute bottom-3 right-3"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: isHovered ? 1 : 0.7, x: isHovered ? 0 : 8 }}
             transition={{ type: "spring", stiffness: 300, delay: 0.1 }}
           >
-            <div className="flex items-center gap-2 px-4 py-2 bg-linear-linear(to-r, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2)) backdrop-blur-md rounded-full border border-blue-500/30">
-              <ArrowUpRight size={12} className="text-blue-400" />
-              <span className="text-xs font-semibold text-white">
-                Interactive Preview
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-linear-linear(to-r, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15)) backdrop-blur-sm rounded-lg border border-blue-500/20">
+              <ArrowUpRight size={11} className="text-blue-400" />
+              <span className="text-[10px] font-semibold text-white">
+                Preview
               </span>
-              <Zap size={10} className="text-yellow-400 animate-pulse" />
+              <Zap size={9} className="text-yellow-400 animate-pulse" />
             </div>
           </motion.div>
 
           {/* Corner accents */}
           <motion.div
-            className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-blue-500/40"
+            className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-blue-500/30"
             initial={{ opacity: 0, width: 0, height: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0.3, width: 32, height: 32 }}
+            animate={{ opacity: isHovered ? 1 : 0.2, width: 24, height: 24 }}
             transition={{ duration: 0.3 }}
           />
           <motion.div
-            className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-purple-500/40"
+            className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-purple-500/30"
             initial={{ opacity: 0, width: 0, height: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0.3, width: 32, height: 32 }}
+            animate={{ opacity: isHovered ? 1 : 0.2, width: 24, height: 24 }}
             transition={{ duration: 0.3, delay: 0.1 }}
           />
         </div>
 
         {/* Floating tech stack preview */}
         <motion.div
-          className="absolute -bottom-6 left-1/2 transform -translate-x-1/2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
-          transition={{ duration: 0.4 }}
+          className="absolute -bottom-5 left-1/2 transform -translate-x-1/2"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 15 }}
+          transition={{ duration: 0.3 }}
         >
-          <div className="flex gap-2 px-4 py-2 bg-gray-900/90 backdrop-blur-md rounded-full border border-gray-700/50 shadow-lg">
+          <div className="flex gap-1.5 px-3 py-1.5 bg-gray-900/80 backdrop-blur-sm rounded-lg border border-gray-700/40 shadow-md">
             {project.techStack?.slice(0, 3).map((tech, idx) => (
               <motion.div
                 key={tech}
-                className="text-xs font-medium text-gray-300"
+                className="text-[10px] font-medium text-gray-300"
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.1 }}
@@ -275,7 +275,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
               </motion.div>
             ))}
             {project.techStack && project.techStack.length > 3 && (
-              <div className="text-xs text-gray-500">
+              <div className="text-[10px] text-gray-500 ml-1">
                 +{project.techStack.length - 3}
               </div>
             )}
@@ -285,109 +285,109 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
 
       {/* Content Section */}
       <motion.div
-        className="w-full lg:w-5/12 relative"
-        initial={{ opacity: 0, x: isAlternate ? -50 : 50 }}
+        className="w-full lg:w-6/12 relative pl-0 lg:pl-6 xl:pl-8"
+        initial={{ opacity: 0, x: isAlternate ? -40 : 40 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+        transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
       >
         {/* Project indicator dengan animasi */}
         <motion.div
-          className="mb-8"
-          whileHover={{ scale: 1.05, rotate: isHovered ? 1 : 0 }}
+          className="mb-6"
+          whileHover={{ scale: 1.03, rotate: isHovered ? 0.5 : 0 }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
-          <div className="inline-flex items-center gap-3">
+          <div className="inline-flex items-center gap-2">
             <motion.div
-              className="w-12 h-0.5 bg-linear-linear(to-r, #3b82f6, #8b5cf6)"
-              animate={isHovered ? { width: ["3rem", "4rem", "3rem"] } : {}}
-              transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-8 h-0.5 bg-linear-linear(to-r, #3b82f6, #8b5cf6)"
+              animate={isHovered ? { width: ["2rem", "3rem", "2rem"] } : {}}
+              transition={{ duration: 1.2, repeat: Infinity }}
             />
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black/40 backdrop-blur-sm border border-gray-800/50">
-              <span className="text-xs font-bold tracking-widest text-gray-400 uppercase">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/30 backdrop-blur-sm border border-gray-800/40">
+              <span className="text-xs font-bold tracking-wide text-gray-400 uppercase">
                 Project
               </span>
               <motion.span
-                className="text-lg font-black bg-linear-linear(to-r, #60a5fa, #a78bfa) bg-clip-text text-transparent"
-                animate={isHovered ? { scale: [1, 1.1, 1] } : {}}
-                transition={{ duration: 0.8, repeat: Infinity }}
+                className="text-sm font-black bg-linear-linear(to-r, #60a5fa, #a78bfa) bg-clip-text text-transparent"
+                animate={isHovered ? { scale: [1, 1.08, 1] } : {}}
+                transition={{ duration: 0.6, repeat: Infinity }}
               >
                 {order.toString().padStart(2, "0")}
               </motion.span>
             </div>
             <motion.div
-              className="w-12 h-0.5 bg-linear-linear(to-r, #8b5cf6, #3b82f6)"
-              animate={isHovered ? { width: ["3rem", "4rem", "3rem"] } : {}}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+              className="w-8 h-0.5 bg-linear-linear(to-r, #8b5cf6, #3b82f6)"
+              animate={isHovered ? { width: ["2rem", "3rem", "2rem"] } : {}}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0.15 }}
             />
           </div>
         </motion.div>
 
         {/* Title dengan efek typography */}
         <motion.h3
-          className="text-4xl md:text-5xl font-bold mb-6 tracking-tight"
+          className="text-2xl md:text-3xl font-bold mb-4 tracking-tight"
           whileHover={{ scale: 1.01 }}
           transition={{ type: "spring", stiffness: 400 }}
         >
-          <span className="bg-linear-linear(to-r, #ffffff, #d1d5db) bg-clip-text text-transparent">
+          <span className="bg-linear-linear(to-r, #ffffff, #e5e7eb) bg-clip-text text-transparent">
             {project.title}
           </span>
           <motion.div
-            className="h-1 w-0 mt-2 bg-linear-linear(to-r, #3b82f6, #ec4899)"
-            animate={isHovered ? { width: "100%" } : { width: "40%" }}
-            transition={{ duration: 0.5 }}
+            className="h-0.5 w-0 mt-2 bg-linear-linear(to-r, #3b82f6, #ec4899)"
+            animate={isHovered ? { width: "100%" } : { width: "35%" }}
+            transition={{ duration: 0.4 }}
           />
         </motion.h3>
 
         {/* Description dengan efek reveal */}
         <motion.p
-          className="text-gray-400 mb-10 leading-relaxed text-lg"
-          initial={{ opacity: 0, y: 10 }}
+          className="text-gray-400 mb-8 leading-relaxed text-base"
+          initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
         >
           {project.description}
         </motion.p>
 
         {/* Tech Stack dengan efek hover cascade */}
-        <div className="mb-12">
-          <div className="text-sm font-semibold text-gray-500 mb-4 tracking-wider">
+        <div className="mb-10">
+          <div className="text-xs font-semibold text-gray-500 mb-3 tracking-wide">
             TECH STACK
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {project.techStack?.map((tech, index) => (
               <motion.span
                 key={tech}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium border backdrop-blur-sm cursor-pointer ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium border backdrop-blur-sm cursor-pointer ${
                   isHovered
-                    ? "bg-white/5 border-white/20 text-white"
-                    : "bg-black/30 border-gray-800 text-gray-400"
+                    ? "bg-white/5 border-white/15 text-white"
+                    : "bg-black/25 border-gray-800/50 text-gray-400"
                 }`}
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                initial={{ opacity: 0, scale: 0.9, y: 15 }}
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{
-                  duration: 0.3,
-                  delay: index * 0.05,
+                  duration: 0.25,
+                  delay: index * 0.04,
                   type: "spring",
                   stiffness: 200,
                 }}
                 whileHover={{
-                  scale: 1.1,
-                  y: -3,
+                  scale: 1.08,
+                  y: -2,
                   backgroundColor: "rgba(59, 130, 246, 0.1)",
-                  borderColor: "rgba(59, 130, 246, 0.3)",
+                  borderColor: "rgba(59, 130, 246, 0.25)",
                   color: "#ffffff",
-                  transition: { duration: 0.2 },
+                  transition: { duration: 0.15 },
                 }}
                 animate={
                   isHovered
                     ? {
-                        y: [0, -2, 0],
+                        y: [0, -1.5, 0],
                         transition: {
-                          duration: 1,
-                          delay: index * 0.1,
+                          duration: 0.8,
+                          delay: index * 0.08,
                           repeat: Infinity,
                           repeatType: "reverse",
                         },
@@ -403,70 +403,70 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
 
         {/* CTA Buttons dengan efek glass morphism */}
         <motion.div
-          className="flex flex-wrap gap-4"
-          initial={{ opacity: 0, y: 20 }}
+          className="flex flex-wrap gap-3"
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
         >
           {project.liveUrl && (
             <motion.div
-              whileHover={{ scale: 1.08, y: -3 }}
+              whileHover={{ scale: 1.06, y: -2 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Link
                 href={project.liveUrl}
                 target="_blank"
-                className="group relative flex items-center gap-3 px-6 py-3.5 rounded-xl border backdrop-blur-md overflow-hidden"
+                className="group relative flex items-center gap-2 px-5 py-2.5 rounded-lg border backdrop-blur-sm overflow-hidden"
               >
                 {/* Animated background */}
                 <motion.div
-                  className="absolute inset-0 bg-linear-linear(45deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2))"
+                  className="absolute inset-0 bg-linear-linear(45deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))"
                   animate={
                     isHovered
                       ? {
                           background: [
-                            "linear-linear(45deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2))",
-                            "linear-linear(45deg, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.4))",
-                            "linear-linear(45deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2))",
+                            "linear-linear(45deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))",
+                            "linear-linear(45deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25))",
+                            "linear-linear(45deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))",
                           ],
                         }
                       : {}
                   }
-                  transition={{ duration: 2, repeat: Infinity }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
                 />
 
                 {/* Border glow */}
                 <motion.div
-                  className="absolute inset-0 rounded-xl border border-transparent"
+                  className="absolute inset-0 rounded-lg border border-transparent"
                   animate={{
                     borderColor: isHovered
-                      ? "rgba(59, 130, 246, 0.5)"
-                      : "rgba(255, 255, 255, 0.1)",
+                      ? "rgba(59, 130, 246, 0.4)"
+                      : "rgba(255, 255, 255, 0.08)",
                   }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 />
 
-                <span className="text-sm font-semibold text-white relative z-10">
+                <span className="text-sm font-medium text-white relative z-10">
                   Live Demo
                 </span>
                 <motion.div
                   animate={{
-                    x: isHovered ? 4 : 0,
+                    x: isHovered ? 3 : 0,
                     rotate: isHovered ? 45 : 0,
                   }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >
-                  <ExternalLink size={16} className="text-blue-400" />
+                  <ExternalLink size={14} className="text-blue-400" />
                 </motion.div>
 
                 {/* Shine effect */}
                 <motion.div
-                  className="absolute inset-0 bg-linear-linear(90deg, transparent, rgba(255,255,255,0.1), transparent)"
+                  className="absolute inset-0 bg-linear-linear(90deg, transparent, rgba(255,255,255,0.08), transparent)"
                   initial={{ x: "-100%" }}
                   whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.6 }}
+                  transition={{ duration: 0.5 }}
                 />
               </Link>
             </motion.div>
@@ -474,37 +474,37 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
 
           {project.repoUrl && (
             <motion.div
-              whileHover={{ scale: 1.08, y: -3 }}
+              whileHover={{ scale: 1.06, y: -2 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Link
                 href={project.repoUrl}
                 target="_blank"
-                className="group relative flex items-center gap-3 px-6 py-3.5 rounded-xl border border-gray-700 backdrop-blur-md bg-black/40 overflow-hidden"
+                className="group relative flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-700/50 backdrop-blur-sm bg-black/30 overflow-hidden"
               >
                 {/* Animated icon */}
                 <motion.div
                   animate={{
-                    rotate: isHovered ? [0, 15, -15, 0] : 0,
-                    scale: isHovered ? 1.1 : 1,
+                    rotate: isHovered ? [0, 12, -12, 0] : 0,
+                    scale: isHovered ? 1.08 : 1,
                   }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.25 }}
                 >
-                  <Github size={16} className="text-gray-300" />
+                  <Github size={14} className="text-gray-300" />
                 </motion.div>
 
-                <span className="text-sm font-semibold text-gray-300">
+                <span className="text-sm font-medium text-gray-300">
                   Source Code
                 </span>
 
                 {/* Particle effect */}
                 {isHovered && (
                   <motion.div
-                    className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full"
+                    className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400/80 rounded-full"
                     initial={{ scale: 0 }}
                     animate={{ scale: [0, 1, 0] }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.4 }}
                   />
                 )}
               </Link>
