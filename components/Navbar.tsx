@@ -9,6 +9,7 @@ const NavigationBar = () => {
   const [activeItem, setActiveItem] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [previousActive, setPreviousActive] = useState<string>("");
   const menuRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
@@ -18,7 +19,13 @@ const NavigationBar = () => {
     { id: "contact", label: "Contact" },
   ];
 
-  // Variants yang benar untuk Framer Motion
+  // Smooth underline transition dengan debouncing
+  useEffect(() => {
+    if (activeItem && activeItem !== previousActive) {
+      setPreviousActive(activeItem);
+    }
+  }, [activeItem, previousActive]);
+
   const logoVariants: Variants = {
     initial: { opacity: 1, scale: 1 },
     hover: {
@@ -109,37 +116,44 @@ const NavigationBar = () => {
     };
   }, [isOpen]);
 
-  // Handle scroll untuk active section dan navbar background
+  // Handle scroll untuk active section
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 10);
 
-      const sections = navItems.map((item) => document.getElementById(item.id));
-      const scrollPosition = window.scrollY + 100;
+          const sections = navItems.map((item) =>
+            document.getElementById(item.id)
+          );
+          const scrollPosition = window.scrollY + 100;
 
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section) {
-          const { offsetTop, offsetHeight } = section;
-          if (
-            scrollPosition >= offsetTop &&
-            scrollPosition < offsetTop + offsetHeight
-          ) {
-            setActiveItem(navItems[i].id);
-            break;
+          for (let i = sections.length - 1; i >= 0; i--) {
+            const section = sections[i];
+            if (section) {
+              const { offsetTop, offsetHeight } = section;
+              if (
+                scrollPosition >= offsetTop &&
+                scrollPosition < offsetTop + offsetHeight
+              ) {
+                setActiveItem(navItems[i].id);
+                break;
+              }
+            }
           }
-        }
+
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    const handleScrollThrottled = () => {
-      requestAnimationFrame(handleScroll);
-    };
-
-    window.addEventListener("scroll", handleScrollThrottled, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
-    return () => window.removeEventListener("scroll", handleScrollThrottled);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleClick = (id: string) => {
@@ -167,16 +181,46 @@ const NavigationBar = () => {
     setActiveItem("");
   };
 
-  const transitionConfig = {
+  // Config animasi yang lebih smooth untuk underline
+  const underlineTransition = {
     type: "spring" as const,
-    stiffness: 400,
-    damping: 25,
+    stiffness: 380, // Lebih rendah untuk lebih smooth
+    damping: 28, // Sedikit lebih tinggi untuk mengurangi overshoot
     mass: 0.8,
+    restDelta: 0.001, // Lebih presisi
+    restSpeed: 0.01, // Lebih halus
   };
 
-  const hoverTransition = {
-    duration: 0.2,
-    ease: "easeInOut" as const,
+  // Alternatif: Tween animation (lebih smooth untuk linear movement)
+  const smoothTweenTransition = {
+    duration: 0.35,
+    ease: [0.25, 0.46, 0.45, 0.94] as const, // easeOutQuad
+  };
+
+  // Variant untuk underline yang lebih smooth
+  const underlineVariants: Variants = {
+    hidden: {
+      scaleX: 0,
+      opacity: 0,
+      transition: { duration: 0.15 },
+    },
+    visible: {
+      scaleX: 1,
+      opacity: 1,
+      transition: smoothTweenTransition,
+    },
+  };
+
+  // Variant untuk hover underline
+  const hoverUnderlineVariants: Variants = {
+    hidden: {
+      scaleX: 0,
+      transition: { duration: 0.2 },
+    },
+    visible: {
+      scaleX: 1,
+      transition: { duration: 0.25, ease: "easeOut" },
+    },
   };
 
   return (
@@ -225,7 +269,7 @@ const NavigationBar = () => {
                   onClick={() => handleClick(item.id)}
                   onMouseEnter={() => setHoveredItem(item.id)}
                   onMouseLeave={() => setHoveredItem(null)}
-                  className="relative text-base font-medium transition-all group"
+                  className="relative text-base font-medium py-1 group"
                   style={{
                     fontFamily: "'Sora', sans-serif",
                   }}
@@ -244,34 +288,51 @@ const NavigationBar = () => {
                     {item.label}
                   </span>
 
-                  {/* Active indicator dengan animasi mulus */}
-                  {activeItem === item.id && (
+                  {/* Active underline dengan animasi yang lebih smooth */}
+                  {activeItem === item.id ? (
                     <motion.div
                       layoutId="nav-indicator"
-                      className="absolute left-0 right-0 h-3px bg-linear-to-r from-gray-900 to-gray-700 -bottom-1.5 rounded-full"
+                      className="absolute left-0 right-0 h-3px bg-linear-to-r from-gray-900 to-gray-700 -bottom-1 rounded-full"
                       initial={false}
-                      transition={transitionConfig}
+                      transition={underlineTransition}
+                      // Tambah transform origin untuk animasi yang lebih natural
+                      style={{
+                        originX:
+                          previousActive === item.id
+                            ? 0.5
+                            : navItems.findIndex((i) => i.id === item.id) >
+                                navItems.findIndex(
+                                  (i) => i.id === previousActive
+                                )
+                              ? 0
+                              : 1,
+                      }}
                     />
+                  ) : (
+                    // Fallback element untuk layout animation
+                    <div className="absolute left-0 right-0 h-3px -bottom-1" />
                   )}
 
-                  {/* Hover effect yang lebih halus */}
+                  {/* Hover underline - lebih smooth dengan keyframes */}
                   <motion.div
-                    className="absolute left-1/2 right-1/2 h-2px bg-gray-400/30 -bottom-1"
-                    initial={{ scaleX: 0, x: "-50%" }}
-                    whileHover={{
-                      scaleX: 1,
-                      transition: hoverTransition,
-                    }}
+                    className="absolute left-0 right-0 h-2px bg-gray-400/40 -bottom-1 origin-left"
+                    initial={{ scaleX: 0 }}
+                    variants={hoverUnderlineVariants}
+                    animate={
+                      hoveredItem === item.id && activeItem !== item.id
+                        ? "visible"
+                        : "hidden"
+                    }
                   />
 
                   {/* Glow effect pada hover */}
-                  {hoveredItem === item.id && (
+                  {hoveredItem === item.id && activeItem !== item.id && (
                     <motion.div
-                      className="absolute inset-0 -m-2 bg-linear-to-r from-gray-100/50 to-transparent rounded-lg"
+                      className="absolute inset-0 -m-2 bg-linear-to-r from-gray-100/30 to-transparent rounded-lg"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
+                      transition={{ duration: 0.15 }}
                     />
                   )}
                 </motion.button>
@@ -298,21 +359,11 @@ const NavigationBar = () => {
                 ease: [0.32, 0.72, 0.32, 1.15],
               }}
             >
-              {/* Background glow effect */}
-              <motion.div
-                className="absolute inset-0 bg-linear-to-r from-gray-900 to-gray-800 rounded-full blur opacity-0 group-hover:opacity-70"
-                initial={false}
-                animate={{ scale: 1.1 }}
-                transition={{ duration: 0.3 }}
-              />
-
               <FileText
                 size={18}
                 className="relative z-10 transition-transform duration-300 group-hover:rotate-12"
               />
               <span className="relative z-10 font-medium">Resume</span>
-
-              {/* Arrow icon dengan animasi */}
               <ChevronRight
                 size={16}
                 className="relative z-10 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
@@ -350,7 +401,6 @@ const NavigationBar = () => {
       <AnimatePresence mode="wait">
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial="hidden"
               animate="visible"
@@ -361,7 +411,6 @@ const NavigationBar = () => {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Mobile Menu Panel */}
             <motion.div
               initial="closed"
               animate="open"
@@ -384,7 +433,6 @@ const NavigationBar = () => {
                     whileHover="hover"
                   >
                     <div className="flex items-center gap-3">
-                      {/* Active dot */}
                       <motion.div
                         className={`w-2 h-2 rounded-full ${
                           activeItem === item.id
@@ -394,7 +442,6 @@ const NavigationBar = () => {
                         animate={{ scale: activeItem === item.id ? 1.2 : 1 }}
                         transition={{ duration: 0.2 }}
                       />
-
                       <span
                         className={`text-lg font-medium ${
                           activeItem === item.id ? "font-semibold" : ""
@@ -403,7 +450,6 @@ const NavigationBar = () => {
                         {item.label}
                       </span>
                     </div>
-
                     <ChevronRight
                       size={18}
                       className={`transition-all duration-300 ${
@@ -412,12 +458,9 @@ const NavigationBar = () => {
                           : "text-gray-400 opacity-0 group-hover:opacity-100"
                       }`}
                     />
-
-                    {/* Hover background */}
                     <div className="absolute inset-0 bg-linear-to-r from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 rounded-xl transition-opacity" />
                   </motion.button>
                 ))}
-
                 <motion.div variants={itemVariants} className="pt-4">
                   <motion.a
                     href="/resume-ikhsan.pdf"
