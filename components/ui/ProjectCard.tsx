@@ -43,11 +43,11 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
   const imageScale = useSpring(1, { stiffness: 150, damping: 15 });
 
   // Transform untuk efek parallax
-  const translateX = useTransform(mouseX, [-200, 200], [-10, 10]);
-  const translateY = useTransform(mouseY, [-200, 200], [-10, 10]);
+  const translateX = useTransform(mouseX, [-200, 200], [-12, 12]);
+  const translateY = useTransform(mouseY, [-200, 200], [-12, 12]);
 
   // Gradient mask berdasarkan mouse position
-  const maskImage = useMotionTemplate`radial-gradient(200px at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.3), transparent 70%)`;
+  const maskImage = useMotionTemplate`radial-gradient(250px at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.4), transparent 80%)`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -85,13 +85,13 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    delay: Math.random() * 0.3,
+    delay: Math.random() * 0.4,
   }));
 
   return (
     <motion.div
       ref={cardRef}
-      className={`relative flex flex-col lg:flex-row gap-8 lg:gap-10 items-center mb-16 px-4 sm:px-6 lg:px-0 ${
+      className={`relative flex flex-col lg:flex-row gap-6 lg:gap-8 items-center mb-16 ${
         isAlternate ? "lg:flex-row-reverse" : ""
       }`}
       onMouseEnter={() => setIsHovered(true)}
@@ -104,7 +104,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
       }}
       initial={{ opacity: 0, y: 60, rotateX: 8 }}
       whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, margin: "-80px" }}
       transition={{
         duration: 0.7,
         ease: [0.22, 1, 0.36, 1],
@@ -118,8 +118,8 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
       <motion.div
         className="absolute inset-0 rounded-2xl opacity-0 -z-10"
         animate={{
-          opacity: isHovered ? 0.1 : 0,
-          background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(99, 102, 241, 0.15), transparent 40%)`,
+          opacity: isHovered ? 0.12 : 0,
+          background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(99, 102, 241, 0.18), transparent 45%)`,
         }}
         transition={{ duration: 0.2 }}
       />
@@ -129,7 +129,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
         particles.map((particle) => (
           <motion.div
             key={particle.id}
-            className="absolute w-0.5 h-0.5 bg-blue-400/20 rounded-full -z-10"
+            className="absolute w-0.5 h-0.5 bg-blue-400/25 rounded-full -z-10"
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
@@ -137,11 +137,11 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
             initial={{ scale: 0, opacity: 0 }}
             animate={{
               scale: [0, 1, 0],
-              opacity: [0, 0.6, 0],
+              opacity: [0, 0.7, 0],
               y: [0, -15],
             }}
             transition={{
-              duration: 1.5,
+              duration: 1.8,
               delay: particle.delay,
               repeat: Infinity,
               repeatDelay: Math.random() * 1.5,
@@ -161,18 +161,18 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
         <motion.div
           className="absolute -inset-0.5 rounded-2xl opacity-0"
           animate={{
-            opacity: isHovered ? 0.8 : 0,
+            opacity: isHovered ? 0.9 : 0,
             background: "linear-linear(45deg, #3b82f6, #8b5cf6, #ec4899)",
           }}
           transition={{ duration: 0.3 }}
-          style={{ filter: "blur(8px)" }}
+          style={{ filter: "blur(10px)" }}
         />
 
-        <div className="relative rounded-xl overflow-hidden border border-gray-800/40 bg-gray-900/10 backdrop-blur-sm">
+        <div className="relative rounded-xl overflow-hidden border border-gray-800/50 bg-gray-900/20 backdrop-blur-sm">
           {/* Animated gradient overlay */}
           <motion.div
             className="absolute inset-0 opacity-0"
-            animate={{ opacity: isHovered ? 0.2 : 0 }}
+            animate={{ opacity: isHovered ? 0.25 : 0 }}
             transition={{ duration: 0.3 }}
             style={{
               background: maskImage,
@@ -198,7 +198,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
                 />
 
                 {/* Subtle gradient overlay */}
-                <div className="absolute inset-0 bg-linear-linear(to-b, transparent 65%, rgba(0,0,0,0.7))" />
+                <div className="absolute inset-0 bg-linear-linear(to-b, transparent 60%, rgba(0,0,0,0.75))" />
               </motion.div>
             ) : (
               <div className="w-full h-full bg-linear-linear(135deg, #1f2937, #111827)" />
@@ -216,9 +216,9 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
             }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-black/70 backdrop-blur-sm rounded-lg border border-white/10">
-              <Sparkles size={9} className="text-yellow-400" />
-              <span className="text-[10px] font-semibold bg-linear-linear(to-r, #fbbf24, #f59e0b) bg-clip-text text-transparent">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-black/75 backdrop-blur-sm rounded-lg border border-white/10">
+              <Sparkles size={10} className="text-yellow-400" />
+              <span className="text-xs font-semibold bg-linear-linear(to-r, #fbbf24, #f59e0b) bg-clip-text text-transparent">
                 FEATURED
               </span>
             </div>
@@ -231,26 +231,24 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
             animate={{ opacity: isHovered ? 1 : 0.7, x: isHovered ? 0 : 8 }}
             transition={{ type: "spring", stiffness: 300, delay: 0.1 }}
           >
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-linear-linear(to-r, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15)) backdrop-blur-sm rounded-lg border border-blue-500/20">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-linear-linear(to-r, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.18)) backdrop-blur-sm rounded-lg border border-blue-500/25">
               <ArrowUpRight size={11} className="text-blue-400" />
-              <span className="text-[10px] font-semibold text-white">
-                Preview
-              </span>
+              <span className="text-xs font-semibold text-white">Preview</span>
               <Zap size={9} className="text-yellow-400 animate-pulse" />
             </div>
           </motion.div>
 
           {/* Corner accents */}
           <motion.div
-            className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-blue-500/30"
+            className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-blue-500/35"
             initial={{ opacity: 0, width: 0, height: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0.2, width: 24, height: 24 }}
+            animate={{ opacity: isHovered ? 1 : 0.25, width: 24, height: 24 }}
             transition={{ duration: 0.3 }}
           />
           <motion.div
-            className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-purple-500/30"
+            className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-purple-500/35"
             initial={{ opacity: 0, width: 0, height: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0.2, width: 24, height: 24 }}
+            animate={{ opacity: isHovered ? 1 : 0.25, width: 24, height: 24 }}
             transition={{ duration: 0.3, delay: 0.1 }}
           />
         </div>
@@ -262,11 +260,11 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
           animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 15 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="flex gap-1.5 px-3 py-1.5 bg-gray-900/80 backdrop-blur-sm rounded-lg border border-gray-700/40 shadow-md">
+          <div className="flex gap-1.5 px-3 py-1.5 bg-gray-900/85 backdrop-blur-sm rounded-lg border border-gray-700/45 shadow-md">
             {project.techStack?.slice(0, 3).map((tech, idx) => (
               <motion.div
                 key={tech}
-                className="text-[10px] font-medium text-gray-300"
+                className="text-xs font-medium text-gray-300"
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.1 }}
@@ -275,7 +273,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
               </motion.div>
             ))}
             {project.techStack && project.techStack.length > 3 && (
-              <div className="text-[10px] text-gray-500 ml-1">
+              <div className="text-xs text-gray-500 ml-1">
                 +{project.techStack.length - 3}
               </div>
             )}
@@ -285,7 +283,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
 
       {/* Content Section */}
       <motion.div
-        className="w-full lg:w-6/12 relative pl-0 lg:pl-6 xl:pl-8"
+        className="w-full lg:w-6/12 relative"
         initial={{ opacity: 0, x: isAlternate ? -40 : 40 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
@@ -300,11 +298,11 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
           <div className="inline-flex items-center gap-2">
             <motion.div
               className="w-8 h-0.5 bg-linear-linear(to-r, #3b82f6, #8b5cf6)"
-              animate={isHovered ? { width: ["2rem", "3rem", "2rem"] } : {}}
+              animate={isHovered ? { width: ["2rem", "2.5rem", "2rem"] } : {}}
               transition={{ duration: 1.2, repeat: Infinity }}
             />
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/30 backdrop-blur-sm border border-gray-800/40">
-              <span className="text-xs font-bold tracking-wide text-gray-400 uppercase">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/35 backdrop-blur-sm border border-gray-800/50">
+              <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">
                 Project
               </span>
               <motion.span
@@ -317,7 +315,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
             </div>
             <motion.div
               className="w-8 h-0.5 bg-linear-linear(to-r, #8b5cf6, #3b82f6)"
-              animate={isHovered ? { width: ["2rem", "3rem", "2rem"] } : {}}
+              animate={isHovered ? { width: ["2rem", "2.5rem", "2rem"] } : {}}
               transition={{ duration: 1.2, repeat: Infinity, delay: 0.15 }}
             />
           </div>
@@ -341,7 +339,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
 
         {/* Description dengan efek reveal */}
         <motion.p
-          className="text-gray-400 mb-8 leading-relaxed text-base"
+          className="text-gray-400 mb-6 leading-relaxed text-sm"
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -351,7 +349,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
         </motion.p>
 
         {/* Tech Stack dengan efek hover cascade */}
-        <div className="mb-10">
+        <div className="mb-8">
           <div className="text-xs font-semibold text-gray-500 mb-3 tracking-wide">
             TECH STACK
           </div>
@@ -361,7 +359,7 @@ export default function ProjectCard({ project, order }: ProjectCardProps) {
                 key={tech}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium border backdrop-blur-sm cursor-pointer ${
                   isHovered
-                    ? "bg-white/5 border-white/15 text-white"
+                    ? "bg-white/5 border-white/20 text-white"
                     : "bg-black/25 border-gray-800/50 text-gray-400"
                 }`}
                 initial={{ opacity: 0, scale: 0.9, y: 15 }}
