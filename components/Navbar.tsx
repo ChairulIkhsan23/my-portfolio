@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { Menu, X, FileText } from "lucide-react";
+import { Menu, X, FileText, ChevronRight } from "lucide-react";
 
 const NavigationBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeItem, setActiveItem] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
     { id: "about", label: "About" },
@@ -16,15 +18,104 @@ const NavigationBar = () => {
     { id: "contact", label: "Contact" },
   ];
 
+  // Variants yang benar untuk Framer Motion
+  const logoVariants: Variants = {
+    initial: { opacity: 1, scale: 1 },
+    hover: {
+      scale: 1.05,
+      transition: { duration: 0.2, ease: "easeInOut" },
+    },
+    tap: {
+      scale: 0.95,
+      transition: { duration: 0.1, ease: "easeInOut" },
+    },
+  };
+
+  const mobileButtonVariants: Variants = {
+    initial: { rotate: 0 },
+    animate: { rotate: isOpen ? 180 : 0 },
+  };
+
+  const menuVariants: Variants = {
+    closed: {
+      opacity: 0,
+      y: -20,
+      transition: {
+        duration: 0.3,
+        ease: [0.32, 0.72, 0.32, 1.15],
+      },
+    },
+    open: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: [0.32, 0.72, 0.32, 1.15],
+        staggerChildren: 0.07,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    closed: {
+      opacity: 0,
+      x: -30,
+      scale: 0.9,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    open: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        ease: [0.32, 0.72, 0.32, 1.15],
+      },
+    },
+    hover: {
+      x: 8,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+  };
+
+  const backdropVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   // Handle scroll untuk active section dan navbar background
   useEffect(() => {
     const handleScroll = () => {
-      // Ubah background navbar saat scroll
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
 
-      // Deteksi section yang sedang aktif
       const sections = navItems.map((item) => document.getElementById(item.id));
-      const scrollPosition = window.scrollY + 100; // Offset untuk navbar height
+      const scrollPosition = window.scrollY + 100;
 
       for (let i = sections.length - 1; i >= 0; i--) {
         const section = sections[i];
@@ -41,133 +132,148 @@ const NavigationBar = () => {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial check
+    const handleScrollThrottled = () => {
+      requestAnimationFrame(handleScroll);
+    };
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScrollThrottled, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScrollThrottled);
   }, []);
 
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      const navbarHeight = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition =
+        elementPosition + window.pageYOffset - navbarHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
     }
     setActiveItem(id);
     setIsOpen(false);
   };
 
-  const menuVariants: Variants = {
-    closed: {
-      opacity: 0,
-      y: -20,
-      transition: {
-        duration: 0.2,
-        ease: [0.4, 0, 0.2, 1],
-      },
-    },
-    open: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-        ease: [0, 0, 0.2, 1],
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    closed: {
-      opacity: 0,
-      x: -20,
-      transition: {
-        duration: 0.2,
-        ease: [0.4, 0, 0.2, 1],
-      },
-    },
-    open: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.3,
-        ease: [0, 0, 0.2, 1],
-      },
-    },
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+    setActiveItem("");
   };
 
   const transitionConfig = {
     type: "spring" as const,
-    stiffness: 500,
-    damping: 30,
+    stiffness: 400,
+    damping: 25,
+    mass: 0.8,
   };
 
   const hoverTransition = {
-    duration: 0.3,
+    duration: 0.2,
     ease: "easeInOut" as const,
   };
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm"
-          : "bg-white/95 backdrop-blur-sm border-b border-gray-100"
+          ? "bg-white/98 backdrop-blur-xl border-b border-gray-100/50 shadow-lg shadow-black/5"
+          : "bg-white/95 backdrop-blur-lg border-b border-gray-100/30"
       }`}
+      ref={menuRef}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            transition={{
+              duration: 0.6,
+              ease: [0.32, 0.72, 0.32, 1.15],
+            }}
             className="flex items-center"
           >
-            <button
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                setActiveItem("");
-              }}
-              className="font-bold text-2xl tracking-tight hover:opacity-80 transition-opacity"
+            <motion.button
+              onClick={scrollToTop}
+              className="font-bold text-2xl tracking-tight hover:opacity-80 transition-all"
               style={{ fontFamily: "'Sora', sans-serif" }}
+              variants={logoVariants}
+              initial="initial"
+              whileHover="hover"
+              whileTap="tap"
             >
-              Portfolio
-            </button>
+              <span className="bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Portfolio
+              </span>
+            </motion.button>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-10">
+          <div className="hidden md:flex items-center space-x-12">
             {/* Menu Items */}
-            <div className="flex items-center space-x-10">
+            <div className="flex items-center space-x-12">
               {navItems.map((item) => (
                 <motion.button
                   key={item.id}
                   onClick={() => handleClick(item.id)}
-                  className="relative text-base font-medium transition-colors"
+                  onMouseEnter={() => setHoveredItem(item.id)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  className="relative text-base font-medium transition-all group"
                   style={{
                     fontFamily: "'Sora', sans-serif",
-                    color: activeItem === item.id ? "#000000" : "#374151", // black for active, gray-700 for inactive
                   }}
                   whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  {item.label}
+                  <span
+                    className={`relative z-10 transition-colors duration-300 ${
+                      activeItem === item.id
+                        ? "text-gray-900 font-semibold"
+                        : hoveredItem === item.id
+                          ? "text-gray-800"
+                          : "text-gray-600"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+
+                  {/* Active indicator dengan animasi mulus */}
                   {activeItem === item.id && (
                     <motion.div
-                      layoutId="underline"
-                      className="absolute left-0 right-0 h-0.5 bg-black -bottom-1"
+                      layoutId="nav-indicator"
+                      className="absolute left-0 right-0 h-3px bg-linear-to-r from-gray-900 to-gray-700 -bottom-1.5 rounded-full"
                       initial={false}
                       transition={transitionConfig}
                     />
                   )}
-                  {/* Hover underline */}
+
+                  {/* Hover effect yang lebih halus */}
                   <motion.div
-                    className="absolute left-0 right-0 h-0.5 bg-black -bottom-1 origin-left"
-                    initial={{ scaleX: 0 }}
-                    whileHover={{ scaleX: 1 }}
-                    transition={hoverTransition}
+                    className="absolute left-1/2 right-1/2 h-2px bg-gray-400/30 -bottom-1"
+                    initial={{ scaleX: 0, x: "-50%" }}
+                    whileHover={{
+                      scaleX: 1,
+                      transition: hoverTransition,
+                    }}
                   />
+
+                  {/* Glow effect pada hover */}
+                  {hoveredItem === item.id && (
+                    <motion.div
+                      className="absolute inset-0 -m-2 bg-linear-to-r from-gray-100/50 to-transparent rounded-lg"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  )}
                 </motion.button>
               ))}
             </div>
@@ -177,80 +283,163 @@ const NavigationBar = () => {
               href="/resume-ikhsan.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full hover:bg-gray-900 transition-colors"
+              className="group relative flex items-center gap-3 px-7 py-3.5 bg-linear-to-r from-gray-900 to-gray-800 text-white rounded-full hover:shadow-xl transition-all"
               style={{ fontFamily: "'Sora', sans-serif" }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{
+                scale: 1.05,
+                y: -2,
+              }}
+              whileTap={{ scale: 0.97 }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{
-                delay: 0.2,
-                duration: 0.3,
-                ease: "easeOut",
+                delay: 0.3,
+                duration: 0.4,
+                ease: [0.32, 0.72, 0.32, 1.15],
               }}
             >
+              {/* Background glow effect */}
+              <motion.div
+                className="absolute inset-0 bg-linear-to-r from-gray-900 to-gray-800 rounded-full blur opacity-0 group-hover:opacity-70"
+                initial={false}
+                animate={{ scale: 1.1 }}
+                transition={{ duration: 0.3 }}
+              />
+
               <FileText
                 size={18}
-                className="transition-transform group-hover:rotate-12"
+                className="relative z-10 transition-transform duration-300 group-hover:rotate-12"
               />
-              <span className="font-medium">Resume</span>
+              <span className="relative z-10 font-medium">Resume</span>
+
+              {/* Arrow icon dengan animasi */}
+              <ChevronRight
+                size={16}
+                className="relative z-10 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
+              />
             </motion.a>
           </div>
 
           {/* Mobile Menu Button */}
           <motion.button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            whileTap={{ scale: 0.95 }}
+            className="md:hidden p-3 rounded-xl hover:bg-gray-100/50 transition-all relative group"
+            whileTap={{ scale: 0.9 }}
+            variants={mobileButtonVariants}
+            initial="initial"
+            animate="animate"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            <div className="absolute inset-0 bg-gray-200/50 rounded-xl group-hover:bg-gray-200 transition-colors" />
+            <motion.div
+              className="relative z-10"
+              animate={{ rotate: isOpen ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {isOpen ? (
+                <X size={24} className="text-gray-800" />
+              ) : (
+                <Menu size={24} className="text-gray-700" />
+              )}
+            </motion.div>
           </motion.button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence mode="wait">
         {isOpen && (
-          <motion.div
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
-            className="md:hidden bg-white border-t border-gray-100"
-          >
-            <div className="px-6 py-8 space-y-6">
-              {navItems.map((item) => (
-                <motion.button
-                  key={item.id}
-                  onClick={() => handleClick(item.id)}
-                  variants={itemVariants}
-                  className={`block w-full text-left text-lg font-medium py-3 transition-colors ${
-                    activeItem === item.id
-                      ? "text-black font-semibold"
-                      : "text-gray-700"
-                  }`}
-                  style={{ fontFamily: "'Sora', sans-serif" }}
-                  whileHover={{ x: 10 }}
-                >
-                  {item.label}
-                  {activeItem === item.id && (
-                    <div className="w-2 h-2 bg-black rounded-full mt-1" />
-                  )}
-                </motion.button>
-              ))}
-              <motion.a
-                href="/resume-ikhsan.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                variants={itemVariants}
-                className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-black text-white rounded-full hover:bg-gray-900 transition-colors"
-                style={{ fontFamily: "'Sora', sans-serif" }}
-              >
-                <FileText size={18} />
-                <span className="font-medium">Resume</span>
-              </motion.a>
-            </div>
-          </motion.div>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={backdropVariants}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm md:hidden z-40"
+              onClick={() => setIsOpen(false)}
+            />
+
+            {/* Mobile Menu Panel */}
+            <motion.div
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={menuVariants}
+              className="md:hidden fixed top-20 left-4 right-4 bg-white/95 backdrop-blur-xl rounded-2xl border border-gray-100/50 shadow-2xl overflow-hidden z-50"
+            >
+              <div className="px-6 py-8 space-y-2">
+                {navItems.map((item) => (
+                  <motion.button
+                    key={item.id}
+                    onClick={() => handleClick(item.id)}
+                    variants={itemVariants}
+                    className={`relative group flex items-center justify-between w-full text-left py-4 px-4 rounded-xl transition-all ${
+                      activeItem === item.id
+                        ? "bg-gray-50 text-gray-900"
+                        : "text-gray-700 hover:bg-gray-50/50"
+                    }`}
+                    style={{ fontFamily: "'Sora', sans-serif" }}
+                    whileHover="hover"
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Active dot */}
+                      <motion.div
+                        className={`w-2 h-2 rounded-full ${
+                          activeItem === item.id
+                            ? "bg-linear-to-r from-gray-900 to-gray-700"
+                            : "bg-gray-300"
+                        }`}
+                        animate={{ scale: activeItem === item.id ? 1.2 : 1 }}
+                        transition={{ duration: 0.2 }}
+                      />
+
+                      <span
+                        className={`text-lg font-medium ${
+                          activeItem === item.id ? "font-semibold" : ""
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                    </div>
+
+                    <ChevronRight
+                      size={18}
+                      className={`transition-all duration-300 ${
+                        activeItem === item.id
+                          ? "text-gray-900 opacity-100"
+                          : "text-gray-400 opacity-0 group-hover:opacity-100"
+                      }`}
+                    />
+
+                    {/* Hover background */}
+                    <div className="absolute inset-0 bg-linear-to-r from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 rounded-xl transition-opacity" />
+                  </motion.button>
+                ))}
+
+                <motion.div variants={itemVariants} className="pt-4">
+                  <motion.a
+                    href="/resume-ikhsan.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-center gap-3 w-full px-6 py-4 bg-linear-to-r from-gray-900 to-gray-800 text-white rounded-xl hover:shadow-lg transition-all"
+                    style={{ fontFamily: "'Sora', sans-serif" }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <FileText
+                      size={20}
+                      className="transition-transform duration-300 group-hover:rotate-12"
+                    />
+                    <span className="font-medium">View Resume</span>
+                    <motion.div className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                      <ChevronRight size={16} />
+                    </motion.div>
+                  </motion.a>
+                </motion.div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </nav>
