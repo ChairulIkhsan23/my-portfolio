@@ -28,6 +28,9 @@ const sora = Sora({
 export const metadata: Metadata = {
   title: "Chairul Ikhsan | Portofolio",
   description: "A modern minimalist portfolio",
+  verification: {
+    google: "3fbfe14d56090628",
+  },
 };
 
 // ==============================
