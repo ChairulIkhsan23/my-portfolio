@@ -10,6 +10,7 @@ const NavigationBar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [previousActive, setPreviousActive] = useState<string>("");
+  const [scrollPosition, setScrollPosition] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
@@ -116,27 +117,31 @@ const NavigationBar = () => {
     };
   }, [isOpen]);
 
-  // Handle scroll untuk active section
+  // Handle scroll untuk active section dan transparency effect
   useEffect(() => {
     let ticking = false;
 
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 10);
+          const currentScrollPos = window.scrollY;
+          setScrollPosition(currentScrollPos);
+
+          // Navbar menjadi solid saat di-scroll lebih dari 50px
+          setIsScrolled(currentScrollPos > 50);
 
           const sections = navItems.map((item) =>
             document.getElementById(item.id)
           );
-          const scrollPosition = window.scrollY + 100;
+          const scrollPositionWithOffset = currentScrollPos + 100;
 
           for (let i = sections.length - 1; i >= 0; i--) {
             const section = sections[i];
             if (section) {
               const { offsetTop, offsetHeight } = section;
               if (
-                scrollPosition >= offsetTop &&
-                scrollPosition < offsetTop + offsetHeight
+                scrollPositionWithOffset >= offsetTop &&
+                scrollPositionWithOffset < offsetTop + offsetHeight
               ) {
                 setActiveItem(navItems[i].id);
                 break;
@@ -155,6 +160,36 @@ const NavigationBar = () => {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Hitung opacity berdasarkan scroll position
+  const calculateNavbarOpacity = () => {
+    // Smooth transition: 0px = 0.2, 50px = 0.95
+    const maxOpacity = 0.95;
+    const minOpacity = 0.2;
+    const threshold = 50;
+
+    if (scrollPosition <= 0) return minOpacity;
+    if (scrollPosition >= threshold) return maxOpacity;
+
+    // Linear interpolation
+    const progress = scrollPosition / threshold;
+    return minOpacity + (maxOpacity - minOpacity) * progress;
+  };
+
+  // Hitung blur intensity berdasarkan scroll position
+  const calculateBlurIntensity = () => {
+    // Smooth blur: 0px = blur-sm, 50px = blur-xl
+    const maxBlur = 12; // blur-xl
+    const minBlur = 4; // blur-sm
+    const threshold = 50;
+
+    if (scrollPosition <= 0) return minBlur;
+    if (scrollPosition >= threshold) return maxBlur;
+
+    // Linear interpolation
+    const progress = scrollPosition / threshold;
+    return minBlur + (maxBlur - minBlur) * progress;
+  };
 
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
@@ -184,17 +219,17 @@ const NavigationBar = () => {
   // Config animasi yang lebih smooth untuk underline
   const underlineTransition = {
     type: "spring" as const,
-    stiffness: 380, // Lebih rendah untuk lebih smooth
-    damping: 28, // Sedikit lebih tinggi untuk mengurangi overshoot
+    stiffness: 380,
+    damping: 28,
     mass: 0.8,
-    restDelta: 0.001, // Lebih presisi
-    restSpeed: 0.01, // Lebih halus
+    restDelta: 0.001,
+    restSpeed: 0.01,
   };
 
   // Alternatif: Tween animation (lebih smooth untuk linear movement)
   const smoothTweenTransition = {
     duration: 0.35,
-    ease: [0.25, 0.46, 0.45, 0.94] as const, // easeOutQuad
+    ease: [0.25, 0.46, 0.45, 0.94] as const,
   };
 
   // Variant untuk underline yang lebih smooth
@@ -223,14 +258,27 @@ const NavigationBar = () => {
     },
   };
 
+  // Dynamic styles based on scroll
+  const navbarOpacity = calculateNavbarOpacity();
+  const blurIntensity = calculateBlurIntensity();
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? "bg-white/98 backdrop-blur-xl border-b border-gray-100/50 shadow-lg shadow-black/5"
-          : "bg-white/95 backdrop-blur-lg border-b border-gray-100/30"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
       ref={menuRef}
+      style={{
+        // Smooth transition untuk background dengan opacity yang dihitung
+        backgroundColor: `rgba(255, 255, 255, ${navbarOpacity})`,
+        // Dynamic blur effect
+        backdropFilter: `blur(${blurIntensity}px)`,
+        // Border dengan opacity yang sesuai
+        borderBottom: `1px solid rgba(229, 231, 235, ${navbarOpacity * 0.5})`,
+        // Shadow dengan opacity yang sesuai
+        boxShadow:
+          scrollPosition > 0
+            ? `0 4px 6px -1px rgba(0, 0, 0, ${0.05 * navbarOpacity}), 0 2px 4px -1px rgba(0, 0, 0, ${0.03 * navbarOpacity})`
+            : "none",
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
@@ -253,7 +301,13 @@ const NavigationBar = () => {
               whileHover="hover"
               whileTap="tap"
             >
-              <span className="bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <span
+                className="bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent"
+                style={{
+                  // Text opacity juga menyesuaikan scroll untuk kontras yang lebih baik
+                  opacity: 0.9 + (scrollPosition / 100) * 0.1,
+                }}
+              >
                 Portfolio
               </span>
             </motion.button>
@@ -284,6 +338,13 @@ const NavigationBar = () => {
                           ? "text-gray-800"
                           : "text-gray-600"
                     }`}
+                    style={{
+                      // Text color menyesuaikan opacity navbar
+                      opacity:
+                        activeItem === item.id
+                          ? 1
+                          : 0.7 + (scrollPosition / 100) * 0.3,
+                    }}
                   >
                     {item.label}
                   </span>
@@ -295,7 +356,6 @@ const NavigationBar = () => {
                       className="absolute left-0 right-0 h-3px bg-linear-to-r from-gray-900 to-gray-700 -bottom-1 rounded-full"
                       initial={false}
                       transition={underlineTransition}
-                      // Tambah transform origin untuk animasi yang lebih natural
                       style={{
                         originX:
                           previousActive === item.id
@@ -306,10 +366,10 @@ const NavigationBar = () => {
                                 )
                               ? 0
                               : 1,
+                        opacity: 0.9 + (scrollPosition / 100) * 0.1,
                       }}
                     />
                   ) : (
-                    // Fallback element untuk layout animation
                     <div className="absolute left-0 right-0 h-3px -bottom-1" />
                   )}
 
@@ -323,6 +383,9 @@ const NavigationBar = () => {
                         ? "visible"
                         : "hidden"
                     }
+                    style={{
+                      opacity: 0.4 + (scrollPosition / 100) * 0.6,
+                    }}
                   />
 
                   {/* Glow effect pada hover */}
@@ -333,6 +396,9 @@ const NavigationBar = () => {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.15 }}
+                      style={{
+                        opacity: 0.3 * navbarOpacity,
+                      }}
                     />
                   )}
                 </motion.button>
@@ -345,7 +411,11 @@ const NavigationBar = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="group relative flex items-center gap-3 px-7 py-3.5 bg-linear-to-r from-gray-900 to-gray-800 text-white rounded-full hover:shadow-xl transition-all"
-              style={{ fontFamily: "'Sora', sans-serif" }}
+              style={{
+                fontFamily: "'Sora', sans-serif",
+                // Button opacity juga menyesuaikan scroll
+                opacity: 0.95 + (scrollPosition / 100) * 0.05,
+              }}
               whileHover={{
                 scale: 1.05,
                 y: -2,
@@ -380,8 +450,17 @@ const NavigationBar = () => {
             initial="initial"
             animate="animate"
             transition={{ duration: 0.3, ease: "easeInOut" }}
+            style={{
+              // Button background opacity menyesuaikan navbar
+              backgroundColor: `rgba(243, 244, 246, ${navbarOpacity * 0.5})`,
+            }}
           >
-            <div className="absolute inset-0 bg-gray-200/50 rounded-xl group-hover:bg-gray-200 transition-colors" />
+            <div
+              className="absolute inset-0 bg-gray-200/50 rounded-xl group-hover:bg-gray-200 transition-colors"
+              style={{
+                opacity: navbarOpacity,
+              }}
+            />
             <motion.div
               className="relative z-10"
               animate={{ rotate: isOpen ? 180 : 0 }}
