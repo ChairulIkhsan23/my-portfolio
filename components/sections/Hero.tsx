@@ -162,11 +162,15 @@ export default function Hero() {
   ];
 
   return (
-    <section className="relative bg-white">
-      {/* MENINGKATKAN POSISI KE ATAS */}
+    <section
+      className="relative bg-white"
+      style={{
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          {/* LEFT CONTENT - MENYESUAIKAN TINGGI DENGAN NAVBAR */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -175,7 +179,6 @@ export default function Hero() {
           >
             {/* Name & Role */}
             <div className="space-y-5">
-              {/* HEADER HELLO I'M - SEJAJAR DENGAN NAVBAR */}
               <div className="flex items-center gap-3">
                 <div className="w-2 h-8 bg-gray-900" />
                 <span className="text-sm font-medium text-gray-500 tracking-wider uppercase">
