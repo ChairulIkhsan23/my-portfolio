@@ -165,7 +165,7 @@ export default function Hero() {
     <section
       className="relative bg-white"
       style={{
-        height: "100vh",
+        height: "80vh",
         overflow: "hidden",
       }}
     >
