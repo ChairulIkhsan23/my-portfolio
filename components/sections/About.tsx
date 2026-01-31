@@ -250,7 +250,7 @@ function ExperienceCarousel({
 }
 
 /* ======================
-   Approach Item Component
+  Approach Item Component
 ====================== */
 
 function ApproachItem({
@@ -289,7 +289,7 @@ function ApproachItem({
 }
 
 /* ======================
-   Main About Section
+  Main About Section
 ====================== */
 
 export default function About({ experienceData }: AboutProps) {
@@ -318,31 +318,30 @@ export default function About({ experienceData }: AboutProps) {
   ];
 
   return (
-    <section id="about" className="relative py-20 bg-black overflow-hidden">
+    <section id="about" className="relative py-16 bg-black overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
       </div>
 
-      <div
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 lg:pt-16 relative z-10
-"
-      >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+        {" "}
+        {/* Mengubah pt-10 lg:pt-14 menjadi py-10 untuk atas dan bawah sama */}
         {/* Section Header */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeIn}
-          className="text-center mb-16"
+          className="text-center mb-10"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-3 px-6 py-3 bg-gray-900/50 backdrop-blur-sm rounded-full border border-gray-800 mb-8"
+            className="inline-flex items-center gap-3 px-6 py-3 bg-gray-900/50 backdrop-blur-sm rounded-full border border-gray-800 mb-6"
           >
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
             <span className="text-sm font-medium text-gray-300 uppercase tracking-wider">
@@ -350,7 +349,7 @@ export default function About({ experienceData }: AboutProps) {
             </span>
           </motion.div>
 
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Crafting{" "}
             <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400">
               Digital Excellence
@@ -362,11 +361,10 @@ export default function About({ experienceData }: AboutProps) {
             pengembangan solusi digital.
           </p>
         </motion.div>
-
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left Column - Experience */}
-          <div className="space-y-12">
+          <div className="space-y-10">
             {/* Academic Experience */}
             <motion.div
               initial="hidden"
@@ -420,10 +418,10 @@ export default function About({ experienceData }: AboutProps) {
             viewport={{ once: true }}
             variants={fadeIn}
             transition={{ delay: 0.4 }}
-            className="space-y-12"
+            className="space-y-10"
           >
             {/* Development Approach */}
-            <div className="space-y-8">
+            <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-800">
                   <Zap className="w-8 h-8 text-amber-400" />
@@ -433,7 +431,7 @@ export default function About({ experienceData }: AboutProps) {
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {approachItems.map((item, index) => (
                   <ApproachItem key={index} {...item} index={index} />
                 ))}
@@ -446,14 +444,14 @@ export default function About({ experienceData }: AboutProps) {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="p-8 bg-linear-to-br from-gray-900/50 to-black/50 backdrop-blur-sm rounded-2xl border border-gray-800"
+              className="p-6 bg-linear-to-br from-gray-900/50 to-black/50 backdrop-blur-sm rounded-2xl border border-gray-800"
             >
-              <h4 className="text-2xl font-bold text-white text-center mb-8">
+              <h4 className="text-2xl font-bold text-white text-center mb-6">
                 <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400">
                   By the Numbers
                 </span>
               </h4>
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-3 gap-5">
                 {[
                   {
                     label: "Projects",
