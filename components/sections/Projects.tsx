@@ -39,7 +39,7 @@ export default async function Projects() {
         </div>
 
         {/* Project List */}
-        <div className="space-y-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="space-y-32 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           {projects.map((project, index) => (
             <ProjectCard key={project.id} project={project} order={index + 1} />
           ))}
