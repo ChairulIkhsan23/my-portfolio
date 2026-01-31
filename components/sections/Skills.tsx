@@ -57,7 +57,8 @@ export default function Skills() {
   };
 
   return (
-    <section id="skills" className="pt-28 pb-12 bg-white">
+    <section id="skills" className="py-16 bg-white">
+      {/* Menggunakan py-16 untuk padding atas dan bawah sama */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title with subtle animation */}
         <motion.div
@@ -65,13 +66,13 @@ export default function Skills() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
-          <h1 className="text-5xl font-light text-gray-900 mb-4 tracking-tight">
+          <h1 className="text-5xl font-light text-gray-900 mb-3 tracking-tight">
             Skills & <span className="font-semibold">Expertise</span>
           </h1>
           <div className="w-20 h-0.5 bg-gray-200 mx-auto" />
-          <p className="mt-6 text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="mt-4 text-gray-600 text-lg max-w-2xl mx-auto">
             Tools dan teknologi yang digunakan dalam pengembangan
           </p>
         </motion.div>
@@ -82,7 +83,7 @@ export default function Skills() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
         >
           {skills.map((skill) => {
             const Icon = skill.icon;
@@ -95,17 +96,17 @@ export default function Skills() {
                 className="group"
               >
                 {/* Main card */}
-                <div className="p-8 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300">
+                <div className="p-6 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300">
                   {/* Icon with micro-rotation */}
                   <motion.div
                     variants={iconVariants}
-                    className="w-20 h-20 mx-auto mb-6 flex items-center justify-center"
+                    className="w-16 h-16 mx-auto mb-4 flex items-center justify-center"
                   >
-                    <Icon className="text-4xl text-gray-800" />
+                    <Icon className="text-3xl text-gray-800" />
                   </motion.div>
 
                   {/* Skill name */}
-                  <h3 className="text-center font-semibold text-gray-900 mb-2 text-lg">
+                  <h3 className="text-center font-semibold text-gray-900 mb-1 text-lg">
                     {skill.name}
                   </h3>
 
